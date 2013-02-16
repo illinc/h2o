@@ -31,10 +31,10 @@ fi
 
 
 # удаление старых временных файлов, чтоб чего не вышло
-rm ${DOCNAME}.aux  ${DOCNAME}.bbl  ${DOCNAME}.blg  ${DOCNAME}.ilg  ${DOCNAME}.haux   ${DOCNAME}.html    ${DOCNAME}.htoc  ${DOCNAME}.image.*  ${DOCNAME}.log  ${DOCNAME}.nlo  ${DOCNAME}.nls  ${DOCNAME}.out   ${DOCNAME}.tex~  ${DOCNAME}.toc
+rm ${DOCNAME}.{aux,bbl,blg,ilg,haux,html,htoc,image.*,log,nlo,nls,out,tex~,toc}
 
 
-if hevea ${HVANAME}  ${DOCNAME}
+if hevea ${HVANAME} ${DOCNAME}
 then
     echo 'run'
 else
