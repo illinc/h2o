@@ -1,12 +1,11 @@
-###!/bin/bash
-
+#!/bin/bash
 
 if [[ "$1" == "" ]]
 then
-        echo "Usage $0 document_name"
-        exit
+    echo "Usage $0 document_name"
+    exit
 fi
-# DOCNAME="$1"
+
 DOCNAME=${1%.*}
 
 FILENAME=${DOCNAME}".tex"
@@ -16,85 +15,84 @@ IMGDIR='heveaimg'
 
 if [[ ! (-f ${FILENAME}) ]]
 then
-        echo "Нет файла" $FILENAME
-        exit
+    echo "Нет файла" $FILENAME
+    exit
 fi
 
 # if [[ "$1" == "autoref" ]]
 # then
-#         echo "autoref"
-        HVANAME="article.hva"
-        HVANAME="book.hva"
+#     echo "autoref"
+    HVANAME="article.hva"
+    HVANAME="book.hva"
 # else
-#         echo "thesis"
-#         HVANAME="book.hva"
+#     echo "thesis"
+#     HVANAME="book.hva"
 # fi
 
 
-# # удаление старых временных файлов, чтоб чего не вышло
-rm ${DOCNAME}.aux  ${DOCNAME}.bbl  ${DOCNAME}.blg  ${DOCNAME}.ilg  ${DOCNAME}.haux   ${DOCNAME}.html    ${DOCNAME}.htoc  ${DOCNAME}.image.*  ${DOCNAME}.log  ${DOCNAME}.nlo  ${DOCNAME}.nls  ${DOCNAME}.out   ${DOCNAME}.tex~  ${DOCNAME}.toc
+# удаление старых временных файлов, чтоб чего не вышло
+rm ${DOCNAME}.{aux,bbl,blg,ilg,haux,html,htoc,image.*,log,nlo,nls,out,tex~,toc}
 
 
-if hevea ${HVANAME}  ${DOCNAME}
+if hevea ${HVANAME} ${DOCNAME}
 then
-	echo 'run'
+    echo 'run'
 else
-	exit
+    exit
 fi
 
 # Библиография по ГОСТ'у ------------------------------------------------------
-# 
+#
 # pdflatex ${DOCNAME}  &&    bibtex ${DOCNAME}   &&   bibtex ${DOCNAME}
-# 
+#
 # FAKEBIBNAME=${DOCNAME}'bbl.tex'
-# 
+#
 # echo '\begin{enumerate}' > $FAKEBIBNAME &&\
 # sed '1,/.*\\endcsname\\fi}/ d; s/\\bibitem.*\]/\\bitem/; s/\\BibEmph//; s/\\selectlanguageifdefined.*/\\relax/; s/\\end{thebibliography}/\\end{enumerate}/' < $DOCNAME'.bbl'  >> $FAKEBIBNAME
-
 
 # Библиография для ссылок и сборка документа ----------------------------------
 
 pdflatex ${DOCNAME} && bibtex ${DOCNAME} &&\
-hevea ${HVANAME} ${DOCNAME} &&\
-hevea ${HVANAME} ${DOCNAME} &&\
-sed -i  's/\(\\begin{thebibliography}\)/\\def\\bibitem[#1]#2{\\item}\n\1/' ${DOCNAME}.bbl &&\
-sed -i  's/\\renewcommand{\\@biblabel}\[1\]{#1.}/\\def\\@biblabel#1{#1.}/' ${DOCNAME}.bbl &&\
-hevea ${HVANAME} ${DOCNAME}
+    hevea ${HVANAME} ${DOCNAME} &&\
+    hevea ${HVANAME} ${DOCNAME} &&\
+    sed -i 's/\(\\begin{thebibliography}\)/\\def\\bibitem[#1]#2{\\item}\n\1/' ${DOCNAME}.bbl &&\
+    sed -i 's/\\renewcommand{\\@biblabel}\[1\]{#1.}/\\def\\@biblabel#1{#1.}/' ${DOCNAME}.bbl &&\
+    hevea ${HVANAME} ${DOCNAME}
 
 # Правка файла изображений и сборка рисунков ----------------------------------
 
 mv ${FILENAMEIMAGE} ${FILENAMEIMAGE}.original &&\
-echo '\newif\ifimagen\imagentrue' > ${FILENAMEIMAGE} &&\
-sed '1,/\\begin{document}/ !d' ${FILENAME} >> ${FILENAMEIMAGE} &&\
-sed '1,/\\begin{document}/ d' < ${FILENAMEIMAGE}.original >> ${FILENAMEIMAGE} &&\
-sed -i 's/^\(.*%NOHEVEA\)/%\1/' ${FILENAMEIMAGE} &&\
-sed -i 's/^%\([^%]*%IMAGEN\)/\1/' ${FILENAMEIMAGE} &&\
-sed -i  's/\(\\begin{document}\)/\\pagestyle{empty}\n\1/' ${FILENAMEIMAGE} &&\
-imagen -png -pdf  -todir $IMGDIR ${DOCNAME}
-# imagen -png -pdf -mag 2000  -todir $IMGDIR $FILENAME
+    echo '\newif\ifimagen\imagentrue' > ${FILENAMEIMAGE} &&\
+    sed '1,/\\begin{document}/ !d' ${FILENAME} >> ${FILENAMEIMAGE} &&\
+    sed '1,/\\begin{document}/ d' < ${FILENAMEIMAGE}.original >> ${FILENAMEIMAGE} &&\
+    sed -i 's/^\(.*%NOHEVEA\)/%\1/' ${FILENAMEIMAGE} &&\
+    sed -i 's/^%\([^%]*%IMAGEN\)/\1/' ${FILENAMEIMAGE} &&\
+    sed -i 's/\(\\begin{document}\)/\\pagestyle{empty}\n\1/' ${FILENAMEIMAGE} &&\
+    imagen -png -pdf -todir $IMGDIR ${DOCNAME}
+# imagen -png -pdf -mag 2000 -todir $IMGDIR $FILENAME
 # imagen -png -pdf -mag 4000  -todir $IMGDIR $FILENAME
 
 # Причёсывание таблицы-библиографии
-sed -i  's/\([1-9][0-9]*\.\)<\/DT><DD CLASS="dd-thebibliography">/\1/' ${DOCNAME}'.html'
+sed -i 's/\([1-9][0-9]*\.\)<\/DT><DD CLASS="dd-thebibliography">/\1/' ${DOCNAME}'.html'
 
 # Причёсывание лигатур
-sed -i  's/\"—/—/g; s/<</«/g; s/>>/»/g; s/\"–/–/g; s/–\*/–/g' ${DOCNAME}'.html'
+sed -i 's/\"—/—/g; s/<</«/g; s/>>/»/g; s/\"–/–/g; s/–\*/–/g' ${DOCNAME}'.html'
 
-# 
+#
 # sed -i 's/@caption@\(Рис\. [0-9]\+\):/\1./g; s/@caption@\(Рис\. [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
 # sed -i 's/@caption@\(Таблица [0-9]\+\):/\1./g; s/@caption@\(Таблица [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
 
 # Подготовка файла в офисном формате для копирования текста -------------------
 
-# CURVER=`grep projectversion total.tex | sed   's/.*{projectversion}{\([0-9]*\)}/\1/'`
-# # echo $CURVER
+# CURVER=`grep projectversion total.tex | sed 's/.*{projectversion}{\([0-9]*\)}/\1/'`
+# echo $CURVER
 # TITLEODTNAME='../'$DOCNAME'title.odt'
-# # echo $TITLEODTNAME
+# echo $TITLEODTNAME
 # ODTNAME='../'$DOCNAME'_'$CURVER'.odt'
-# # echo $ODTNAME
-# 
+# echo $ODTNAME
+#
 # cp $TITLEODTNAME $ODTNAME && soffice $ODTNAME
-# soffice ${DOCNAME}'.html' 
-iceweasel ${DOCNAME}'.html' 
+# soffice ${DOCNAME}'.html'
+iceweasel ${DOCNAME}'.html'
 
 echo ${HVANAME} ${DOCNAME}
