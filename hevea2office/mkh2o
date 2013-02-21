@@ -78,9 +78,9 @@ sed -i 's/\([1-9][0-9]*\.\)<\/DT><DD CLASS="dd-thebibliography">/\1/' ${DOCNAME}
 # Причёсывание лигатур
 sed -i 's/\"—/—/g; s/<</«/g; s/>>/»/g; s/\"–/–/g; s/–\*/–/g' ${DOCNAME}'.html'
 
-#
-# sed -i 's/@caption@\(Рис\. [0-9]\+\):/\1./g; s/@caption@\(Рис\. [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
-# sed -i 's/@caption@\(Таблица [0-9]\+\):/\1./g; s/@caption@\(Таблица [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
+
+sed -i 's/@caption@\(Рис\. [0-9]\+\):/\1./g; s/@caption@\(Рис\. [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
+sed -i 's/@caption@\(Таблица [0-9]\+\):/\1./g; s/@caption@\(Таблица [0-9]\+\.[0-9]\+\):/\1./g' ${DOCNAME}'.html'
 
 # Подготовка файла в офисном формате для копирования текста -------------------
 
@@ -92,7 +92,7 @@ sed -i 's/\"—/—/g; s/<</«/g; s/>>/»/g; s/\"–/–/g; s/–\*/–/g' ${DOC
 # echo $ODTNAME
 #
 # cp $TITLEODTNAME $ODTNAME && soffice $ODTNAME
-# soffice ${DOCNAME}'.html'
-iceweasel ${DOCNAME}'.html'
+soffice ${DOCNAME}'.html'
+# open ${DOCNAME}'.html'
 
-echo ${HVANAME} ${DOCNAME}
+# echo ${HVANAME} ${DOCNAME}
